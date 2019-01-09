@@ -1,9 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/white">
+<include layout="@layout/custom_header"
+    android:id="@+id/header"></include>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="160sp"
+    android:orientation="horizontal"
+    android:layout_below="@+id/header"
+    android:layout_margin="10dp"
+    android:weightSum="1.0"
+    android:id="@+id/linear1">
 
-</android.support.constraint.ConstraintLayout>
+
+<ImageView
+    android:layout_width="match_parent"
+    android:layout_height="150sp"
+    android:layout_margin="5dp"
+    android:src="@drawable/golghar"
+    android:layout_weight="0.5"
+    android:id="@+id/golghar"
+    android:scaleType="fitXY"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="150sp"
+        android:layout_margin="5dp"
+        android:src="@drawable/museum"
+        android:layout_weight="0.5"
+        android:scaleType="fitXY"
+        android:id="@+id/museum"/>
+</LinearLayout>
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@+id/header">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="160sp"
+        android:orientation="horizontal"
+
+        android:layout_margin="10dp"
+        android:weightSum="1.0"
+        android:id="@+id/linear2"
+        >
+
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150sp"
+            android:layout_margin="5dp"
+            android:src="@drawable/golghar"
+            android:layout_weight="0.5"
+            android:scaleType="fitXY"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150sp"
+            android:layout_margin="5dp"
+            android:src="@drawable/museum"
+            android:layout_weight="0.5"
+            android:scaleType="fitXY"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="160sp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/linear2"
+        android:layout_margin="10dp"
+        android:weightSum="1.0"
+        android:id="@+id/linear3">
+
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150sp"
+            android:layout_margin="5dp"
+            android:src="@drawable/golghar"
+            android:layout_weight="0.5"
+            android:scaleType="fitXY"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150sp"
+            android:layout_margin="5dp"
+            android:src="@drawable/museum"
+            android:layout_weight="0.5"
+            android:scaleType="fitXY"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="160sp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/linear3"
+        android:layout_margin="10dp"
+        android:weightSum="1.0"
+        android:id="@+id/linear4">
+
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150sp"
+            android:layout_margin="5dp"
+            android:src="@drawable/golghar"
+            android:layout_weight="0.5"
+            android:scaleType="fitXY"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150sp"
+            android:layout_margin="5dp"
+            android:src="@drawable/museum"
+            android:layout_weight="0.5"
+            android:scaleType="fitXY"
+            />
+    </LinearLayout>
+    </RelativeLayout>
+</ScrollView>
+</RelativeLayout>

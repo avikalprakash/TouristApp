@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">TouristApp</string>
+    <string name="app_name">Tourist Guide</string>
+    <string name="cancel">Cancel</string>
+    <string name="gps_message">Please allow your GPS</string>
+    <string name="gps_location">GPS location</string>
+    <string name="allow_gps">Allow GPS</string>
+    <string name="ok">Ok</string>
+    <string name="km_away_from_you">km away from you</string>
 </resources>
