@@ -8,7 +8,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -21,13 +23,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,7 +44,8 @@ import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class MainActivity extends AbsRuntimePermission  {
+public class MainActivity extends AbsRuntimePermission implements View.OnClickListener {
+    String TAG="LOCATIONS";
     LocationManager mlocManager;
     AlertDialog.Builder alert;
     String lat = "";
@@ -56,11 +63,15 @@ public class MainActivity extends AbsRuntimePermission  {
     private static LatLng Destination = null;
     String otherPlaceLat="25.6203";
     String otherPlaceLang="85.1394";
+    String museumPatnaLat="25.6127";
+    String museumPatnaLang="85.1332";
     double slat;
     double slong;
     double dlat;
     double dlong;
-    ImageView golgharImage, museumImage;
+    ImageButton golgharImage, museumImage;
+    LinearLayout linearLoader;
+    TextView current_locationText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,50 +98,10 @@ public class MainActivity extends AbsRuntimePermission  {
         ivheaderleft.setVisibility(View.GONE);
         golgharImage = findViewById(R.id.golghar);
         museumImage = findViewById(R.id.museum);
-        golgharImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                slat=Double.parseDouble(lat);
-                slong=Double.parseDouble(lang);
-                dlat=Double.parseDouble(otherPlaceLat);
-                dlong=Double.parseDouble(otherPlaceLang);
-                Source = new LatLng(slat,slong);
-                Destination = new LatLng(dlat,dlong);
-                //  calculateDistance();
-                Double distance = distance(dlat,dlong,slat,slong);
-
-                Double dd = distance / 0.62137;
-
-                DecimalFormat dff = new DecimalFormat("#.00");
-                // System.out.print(df.format(distance));
-
-                String ddd= String.valueOf(dff.format(dd)+getString(R.string.km_away_from_you));
-                proceedMessage(ddd);
-            }
-        });
-        museumImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                slat=Double.parseDouble(lat);
-                slong=Double.parseDouble(lang);
-                dlat=Double.parseDouble("25.6127");
-                dlong=Double.parseDouble("85.1332");
-                Source = new LatLng(slat,slong);
-                Destination = new LatLng(dlat,dlong);
-                //  calculateDistance();
-                Double distance2 = distance(dlat,dlong,slat,slong);
-
-                Double dd2 = distance2 / 0.62137;
-
-                DecimalFormat dff2 = new DecimalFormat("#.00");
-                // System.out.print(df.format(distance));
-
-                String ddd2= String.valueOf(dff2.format(dd2)+getString(R.string.km_away_from_you));
-                proceedMessage(ddd2);
-            }
-        });
-
-
+        linearLoader = findViewById(R.id.linearLoader);
+        current_locationText = findViewById(R.id.current_location);
+        golgharImage.setOnClickListener(this);
+        museumImage.setOnClickListener(this);
         getGpsLocation();
     }
 
@@ -214,6 +185,7 @@ public class MainActivity extends AbsRuntimePermission  {
     private void getGpsLocation() {
 
         //  locationProgressDialog.show();
+        linearLoader.setVisibility(View.VISIBLE);
         alert = new AlertDialog.Builder(this);
         mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (!mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !mlocManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
@@ -275,7 +247,6 @@ public class MainActivity extends AbsRuntimePermission  {
                         count++;
                         if(count >20)
                         {
-                            //  if(locationProgressDialog.isShowing()) locationProgressDialog.dismiss();
                             if (myLocation==null){
                                 //Toast.makeText(getApplicationContext(), "Please check your Internet Connection", Toast.LENGTH_LONG).show();
                                 timer1.cancel();
@@ -301,22 +272,14 @@ public class MainActivity extends AbsRuntimePermission  {
 
                 lat=String.valueOf(df.format(location.getLatitude()));
                 lang=String.valueOf(df.format(location.getLongitude()));
-
+                getAddress(location.getLatitude(), location.getLongitude());
+                linearLoader.setVisibility(View.GONE);
                 //    locationProgressDialog.setMessage("lat: "+lat+"\n"+"long:"+lang+"\n"+"accuracy:"+location.getAccuracy());
                 if (location.getAccuracy()>0 && location.getAccuracy()<100) {
-                    //    if(locationProgressDialog.isShowing()) locationProgressDialog.dismiss();
-                    //     Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + lat + "\nLong: " + lang, Toast.LENGTH_LONG).show();
-                   /* if (Double.valueOf(lat).equals(",")|| Double.valueOf(lang).equals(",")){
-                        lat=".";
-                        lang=".";
-                    }*/
-                 //   proceedMessage("Latitude : "+lat+", Longitude: "+lang);
 
                     lat=lat.replaceAll(",",".");
 
                     lang=lang.replaceAll(",",".");
-
-
                 }
                 else
                 {
@@ -408,46 +371,71 @@ public class MainActivity extends AbsRuntimePermission  {
         return (rad * 180.0 / Math.PI);
     }
 
-  /*  @Override
+    @Override
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.golghar:
-                slat=Double.parseDouble(lat);
-                slong=Double.parseDouble(lang);
-                dlat=Double.parseDouble(otherPlaceLat);
-                dlong=Double.parseDouble(otherPlaceLang);
-                Source = new LatLng(slat,slong);
-                Destination = new LatLng(dlat,dlong);
-                //  calculateDistance();
-                Double distance = distance(dlat,dlong,slat,slong);
+                 if (lat!=null && !lat.equals("")) {
+                     getDistance(lat, lang, otherPlaceLat, otherPlaceLang);
+                 }
 
-                Double dd = distance / 0.62137;
-
-                DecimalFormat dff = new DecimalFormat("#.00");
-                // System.out.print(df.format(distance));
-
-                String ddd= String.valueOf(dff.format(dd)+getString(R.string.km_away_from_you));
-                proceedMessage(ddd);
                 break;
 
             case R.id.museum:
-                slat=Double.parseDouble(lat);
-                slong=Double.parseDouble(lang);
-                dlat=Double.parseDouble("25.6127");
-                dlong=Double.parseDouble("85.1332");
-                Source = new LatLng(slat,slong);
-                Destination = new LatLng(dlat,dlong);
-                //  calculateDistance();
-                Double distance2 = distance(dlat,dlong,slat,slong);
-
-                Double dd2 = distance2 / 0.62137;
-
-                DecimalFormat dff2 = new DecimalFormat("#.00");
-                // System.out.print(df.format(distance));
-
-                String ddd2= String.valueOf(dff2.format(dd2)+getString(R.string.km_away_from_you));
-                proceedMessage(ddd2);
+                if (lat!=null && !lat.equals("")) {
+                    getDistance(lat, lang, museumPatnaLat, museumPatnaLang);
+                }
                 break;
         }
-    }*/
+    }
+
+  public void getDistance(String lat, String lang, String otherPlaceLat, String otherPlaceLang){
+      slat = Double.parseDouble(lat);
+      slong = Double.parseDouble(lang);
+      dlat = Double.parseDouble(otherPlaceLat);
+      dlong = Double.parseDouble(otherPlaceLang);
+      Source = new LatLng(slat, slong);
+      Destination = new LatLng(dlat, dlong);
+      //  calculateDistance();
+      Double distance = distance(dlat, dlong, slat, slong);
+
+      Double dd = distance / 0.62137;
+
+      DecimalFormat dff = new DecimalFormat("#.00");
+      // System.out.print(df.format(distance));
+      String ddd = String.valueOf("This location is "+dff.format(dd) +" "+ getString(R.string.km_away_from_you));
+      proceedMessage(ddd);
+  }
+
+    public void getAddress(Double latitude, Double longitude) {
+        Geocoder geocoder;
+        List<Address> addresses;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+            String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+            String city = addresses.get(0).getSubAdminArea();
+            String state = addresses.get(0).getAdminArea();
+            String street = addresses.get(0).getSubLocality();
+            String address2 = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+            String city2 = addresses.get(0).getLocality();
+            String state2 = addresses.get(0).getAdminArea();
+            String country = addresses.get(0).getCountryName();
+            String postalCode = addresses.get(0).getPostalCode();
+            String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
+
+            Log.d(TAG, "getAddress:  address" + address2);
+            Log.d(TAG, "getAddress:  city" + city2);
+            Log.d(TAG, "getAddress:  state" + state2);
+            Log.d(TAG, "getAddress:  postalCode" + postalCode);
+            Log.d(TAG, "getAddress:  knownName" + knownName);
+           if (!knownName.equals("null") && !city2.equals("null")) {
+               current_locationText.setText("Now you are at : " + knownName + ", " + city2);
+               current_locationText.setVisibility(View.VISIBLE);
+              }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
